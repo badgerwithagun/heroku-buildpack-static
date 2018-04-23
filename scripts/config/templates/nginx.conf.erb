@@ -40,13 +40,6 @@ http {
 
   server {
 
-    location /api/ws/ {
-      proxy_pass ${API_URL}/api/ws;
-      proxy_http_version 1.1;
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
-    }
-
     listen <%= port %> reuseport;
     charset <%= encoding %>;
     port_in_redirect off;
@@ -103,10 +96,18 @@ http {
   <% proxies.each do |location, hash| %>
     set $<%= hash['name'] %> <%= hash['host'] %>;
     location @<%= location %> {
+
       rewrite ^<%= location %>/?(.*)$ <%= hash['path'] %>/$1 break;
       # can reuse variable set above
       proxy_pass $<%= hash['name'] %>;
       proxy_ssl_server_name on;
+
+     <% if location == '/api/ws' or location == '/api/ws/' -%>
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+     <% end -%>
+
       <% %w(http https).each do |scheme| %>
       proxy_redirect <%= hash["redirect_#{scheme}"] %> <%= location %>;
       <% end %>
