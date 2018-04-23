@@ -102,11 +102,11 @@ http {
       proxy_pass $<%= hash['name'] %>;
       proxy_ssl_server_name on;
 
-     <% if location == '/api/ws' or location == '/api/ws/' -%>
+     <% if location == '/api/ws' or location == '/api/ws/' %>
       proxy_http_version 1.1;
       proxy_set_header Upgrade $http_upgrade;
       proxy_set_header Connection "upgrade";
-     <% end -%>
+     <% end %>
 
       <% %w(http https).each do |scheme| %>
       proxy_redirect <%= hash["redirect_#{scheme}"] %> <%= location %>;
